@@ -25,6 +25,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // Mount Router
 app.use('/api/v1/expenses', require('./routes/expense'));
+app.use('/api/v1/todos', require('./routes/todos'));
 
 app.use(errorHandler);
 
