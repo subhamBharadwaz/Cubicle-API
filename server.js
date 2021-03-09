@@ -2,6 +2,7 @@ const express = require('express');
 const dotEnv = require('dotenv');
 const morgan = require('morgan');
 const colors = require('colors');
+const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/error');
 
@@ -15,6 +16,9 @@ connectDB();
 
 // Body Parser
 app.use(express.json());
+
+// Cookie Parser
+app.use(cookieParser());
 
 const PORT = process.env.PORT || 5000;
 
