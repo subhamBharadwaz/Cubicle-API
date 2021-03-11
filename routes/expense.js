@@ -8,7 +8,9 @@ const {
 const router = express.Router();
 const { protect } = require('../middleware/auth');
 
-router.route('/').get(protect, getAllExpenses).post(protect, createExpense);
-router.route('/:id').put(protect, updateExpense).delete(protect, deleteExpense);
+router.use(protect);
+
+router.route('/').get(getAllExpenses).post(createExpense);
+router.route('/:id').put(updateExpense).delete(deleteExpense);
 
 module.exports = router;
