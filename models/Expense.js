@@ -10,6 +10,12 @@ const ExpenseSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Please add a positive or negative number'],
   },
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+
   createdAt: {
     type: Date,
     default: Date.now(),
