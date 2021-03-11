@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const colors = require('colors');
 const cookieParser = require('cookie-parser');
 const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/error');
 
@@ -27,6 +28,9 @@ const PORT = process.env.PORT || 5000;
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// Set security headers
+app.use(helmet());
 
 // Sanitize data
 app.use(mongoSanitize());
