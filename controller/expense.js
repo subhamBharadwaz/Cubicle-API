@@ -30,18 +30,31 @@ exports.createExpense = asyncHandler(async (req, res, next) => {
 // @access  Private
 
 exports.updateExpense = asyncHandler(async (req, res, next) => {
-  const expense = await Expenses.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  let expense = await Expenses.findById(req.params.id);
   if (!expense) {
     return next(
       new ErrorResponse(
         `Expense not found with the id of ${req.params.id}`,
-        400
+        404
       )
     );
   }
+
+  // Make sure user is expense owner
+  if (expense.user.toString() !== req.user.id) {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to update this expense`,
+        404
+      )
+    );
+  }
+  console.log(req.user.id);
+  expense = await Expenses.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
   res.status(202).json({ success: true, data: expense });
 });
 
@@ -50,14 +63,26 @@ exports.updateExpense = asyncHandler(async (req, res, next) => {
 // @access  Private
 
 exports.deleteExpense = asyncHandler(async (req, res, next) => {
-  const expense = await Expenses.findByIdAndDelete(req.params.id);
+  const expense = await Expenses.findById(req.params.id);
   if (!expense) {
     return next(
       new ErrorResponse(
         `Expense not found with the id of ${req.params.id}`,
-        400
+        404
       )
     );
   }
+
+  // Make sure user is expense owner
+  if (expense.user.toString() !== req.user.id) {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to delete this expense`,
+        404
+      )
+    );
+  }
+
+  expense.remove();
   res.status(200).json({ success: true, data: {} });
 });
