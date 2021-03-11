@@ -3,6 +3,7 @@ const dotEnv = require('dotenv');
 const morgan = require('morgan');
 const colors = require('colors');
 const cookieParser = require('cookie-parser');
+const mongoSanitize = require('express-mongo-sanitize');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/error');
 
@@ -26,6 +27,9 @@ const PORT = process.env.PORT || 5000;
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// Sanitize data
+app.use(mongoSanitize());
 
 // Mount Router
 app.use('/api/v1/expenses', require('./routes/expense'));
