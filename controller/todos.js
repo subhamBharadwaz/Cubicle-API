@@ -1,6 +1,7 @@
 const TodoSchema = require('../models/Todo');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
+const Todo = require('../models/Todo');
 // @desc    Get all todos
 // @route   GET /api/v1/todos
 // @access  Private
@@ -16,6 +17,9 @@ exports.getAllTodos = asyncHandler(async (req, res, next) => {
 // @access  Private
 
 exports.createTodo = asyncHandler(async (req, res, next) => {
+  // Add user to req.body
+  req.body.user = req.user.id;
+
   const todo = await TodoSchema.create(req.body);
   res.status(201).json({ success: true, data: todo });
 });
@@ -25,15 +29,28 @@ exports.createTodo = asyncHandler(async (req, res, next) => {
 // @access  Private
 
 exports.updateTodo = asyncHandler(async (req, res, next) => {
-  const todo = await TodoSchema.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  let todo = await TodoSchema.findById(req.params.id);
   if (!todo) {
     return next(
       new ErrorResponse(`Todo not found with id ${req.params.id}`, 400)
     );
   }
+
+  // Make sure user is todo owner
+  if (todo.user.toString() !== req.user.id) {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to update this todo`,
+        404
+      )
+    );
+  }
+
+  todo = await Todo.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
   res.status(200).json({ success: true, data: todo });
 });
 
@@ -42,11 +59,23 @@ exports.updateTodo = asyncHandler(async (req, res, next) => {
 // @access  Private
 
 exports.deleteTodo = asyncHandler(async (req, res, next) => {
-  const todo = await TodoSchema.findByIdAndDelete(req.params.id);
+  const todo = await TodoSchema.findById(req.params.id);
   if (!todo) {
     return next(
       new ErrorResponse(`Todo not found with id ${req.params.id}`, 400)
     );
   }
+
+  // Make sure user is todo owner
+  if (todo.user.toString() !== req.user.id) {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to delete this todo`,
+        404
+      )
+    );
+  }
+
+  todo.remove();
   res.status(200).json({ success: true, data: {} });
 });

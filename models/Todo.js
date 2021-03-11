@@ -6,6 +6,12 @@ const TodoSchema = new mongoose.Schema({
     trim: true,
     required: [true, 'Please add some text'],
   },
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+
   createdAt: {
     type: Date,
     default: Date.now(),
