@@ -3,11 +3,26 @@ const Expenses = require('../models/Expense');
 const asyncHandler = require('../middleware/async');
 
 // @desc    Get all expenses
-// @route   GET /api/v1/expenses
+// @route   GET /api/v1/expenses/user/:userId
 // @access  Private
 
 exports.getAllExpenses = asyncHandler(async (req, res, next) => {
-  const expenses = await Expenses.find();
+  const expenses = await Expenses.find({
+    user: req.params.userId,
+  })
+    .populate('user')
+    .lean();
+
+  // // Make sure user is expense owner
+  // if (expense.user.toString() !== req.user.id) {
+  //   return next(
+  //     new ErrorResponse(
+  //       `User ${req.user.id} is not authorized to update this expense`,
+  //       404
+  //     )
+  //   );
+  // }
+
   res
     .status(200)
     .json({ success: true, count: expenses.length, data: expenses });

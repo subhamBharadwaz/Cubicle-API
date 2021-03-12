@@ -10,7 +10,8 @@ const { protect } = require('../middleware/auth');
 
 router.use(protect);
 
-router.route('/').get(getAllExpenses).post(createExpense);
+router.route('/user/:userId').get(getAllExpenses);
+router.route('/').post(createExpense);
 router.route('/:id').put(updateExpense).delete(deleteExpense);
 
 module.exports = router;

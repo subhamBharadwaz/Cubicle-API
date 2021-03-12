@@ -3,11 +3,15 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Todo = require('../models/Todo');
 // @desc    Get all todos
-// @route   GET /api/v1/todos
+// @route   GET /api/v1/todos/user.:userId
 // @access  Private
 
 exports.getAllTodos = asyncHandler(async (req, res, next) => {
-  const todos = await TodoSchema.find();
+  const todos = await TodoSchema.find({
+    user: req.params.userId,
+  })
+    .populate('user')
+    .lean();
 
   res.status(200).json({ success: true, count: todos.length, data: todos });
 });
